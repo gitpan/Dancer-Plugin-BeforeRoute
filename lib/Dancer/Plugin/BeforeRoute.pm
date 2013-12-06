@@ -36,15 +36,15 @@ Michael Vu, C<< <micvu at cpan.org> >>
  
 =head1 BUGS
  
-Please report any bugs or feature requests to C<bug-dancer-plugin-assets at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dancer::Plugin::Assets>.  I will be notified, and then you'll
+Please report any bugs or feature requests to C<bug-dancer-plugin-beforeroute at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dancer::Plugin::BeforeRoute>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
  
 =head1 SUPPORT
  
 You can find documentation for this module with the perldoc command.
  
-    perldoc Dancer::Plugin::Assets
+    perldoc Dancer::Plugin::BeforeRoute
  
 You can also look for information at:
  
@@ -81,7 +81,7 @@ under the same terms as Perl itself.
 
 package Dancer::Plugin::BeforeRoute;
 {
-  $Dancer::Plugin::BeforeRoute::VERSION = '0.1';
+  $Dancer::Plugin::BeforeRoute::VERSION = '0.2';
 }
 use Dancer ":syntax";
 use Dancer::Plugin;
