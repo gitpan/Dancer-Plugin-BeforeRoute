@@ -1,3 +1,6 @@
+0.4 2013-12-09
+    - Export the route checking helper
+
 0.3 2013-12-09
     - Update POD
     - Using effective test cases

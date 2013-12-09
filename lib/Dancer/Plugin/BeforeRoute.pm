@@ -1,3 +1,4 @@
+
 =head1 NAME
  
 Dancer::Plugin::BeforeRoute - A before hook for a specify route or routes
@@ -23,6 +24,8 @@ Dancer::Plugin::BeforeRoute - A before hook for a specify route or routes
      ## Return "foo"
      return var "before_run";
  };
+
+ before_template_route 
 
 =head1 DESCRIPTION
 
@@ -81,13 +84,38 @@ under the same terms as Perl itself.
 
 package Dancer::Plugin::BeforeRoute;
 {
-  $Dancer::Plugin::BeforeRoute::VERSION = '0.3';
+  $Dancer::Plugin::BeforeRoute::VERSION = '0.4';
 }
 use Carp "confess";
 use Dancer ":syntax";
 use Dancer::Plugin;
 
 register before_route => sub {
+
+    my ( $path, $subref, @methods ) = _args(@_);
+
+    hook before => sub {
+        request_for( $path, @methods ) or return;
+        $subref->();
+    };
+};
+
+register request_for => sub {
+    my ( $path, @methods ) = @_;
+
+    my $request_method = request->method;
+
+    if ( !_is_the_right_method( request->method, @methods ) ) {
+        return;
+    }
+    if ( !_is_the_right_path( request->path_info, $path ) ) {
+        return;
+    }
+
+    return 1;
+};
+
+sub _args {
     my $methods = shift
         or confess "dev: missing method\n";
 
@@ -98,17 +126,8 @@ register before_route => sub {
     my $subref = shift
         or confess "dev: missing a subref -> [[ @methods: $path ]]\n";
 
-    hook before => sub {
-        my $request_method = request->method;
-        if ( !_is_the_right_method( request->method, @methods ) ) {
-            return;
-        }
-        if ( !_is_the_right_path( request->path_info, $path ) ) {
-            return;
-        }
-        $subref->();
-    };
-};
+    return ( $path, $subref, @methods );
+}
 
 sub _is_the_right_method {
     my $method  = shift;
@@ -120,11 +139,11 @@ sub _is_the_right_path {
     my $got_path      = shift;
     my $expected_path = shift;
     if ( ref $expected_path ) {
-        return $got_path =~/$expected_path/ ? 1 : 0;
+        return $got_path =~ /$expected_path/ ? 1 : 0;
     }
-    if ( $expected_path =~/\:/ ) {
-        $expected_path =~s/\:[^\/]+/[^\/]+/g;
-        return $got_path =~/$expected_path/ ? 1 : 0;
+    if ( $expected_path =~ /\:/ ) {
+        $expected_path =~ s/\:[^\/]+/[^\/]+/g;
+        return $got_path =~ /$expected_path/ ? 1 : 0;
     }
     return $got_path eq $expected_path ? 1 : 0;
 }
