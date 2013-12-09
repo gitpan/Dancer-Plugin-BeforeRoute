@@ -1,34 +1,34 @@
 =head1 NAME
  
-Dancer::Plugin::BeforeRoute - Run something before a specific route run
+Dancer::Plugin::BeforeRoute - A before hook for a specify route or routes
   
 =head1 SYNOPSIS
 
  use Dancer::Plugin::BeforeRoute;
 
  before_route get => "/", sub {
-     var before_home => 1;
+     var before_run => "homepage";
  };
 
  get "/" => sub {
-     ## Return 1
-     return var "before_home";
+     ## Return "homepage"
+     return var "before_run";
+ };
+
+ before_route get => "/foo", sub {
+     var before_run => "foo"
  };
 
  get "/foo" => sub {
-     ## Return nothing
-     return var "before_home";
+     ## Return "foo"
+     return var "before_run";
  };
 
 =head1 DESCRIPTION
 
-Most developers add lines of if-else to do something in before sub before run a path.
+Dancer provides hook before to do everythings before going any route.
 
-Or some people has lot of before hook with duplicated code to check path to run before running a path.
-
-But I think we can do it better, No big sub and no duplication checks. Use this plugin please!:)
-
-Tell me if you have a better idea.
+This plugin is to provide a little bit more specifically hook before route or route(s) executed.
 
 =head1 AUTHOR
  
@@ -81,20 +81,22 @@ under the same terms as Perl itself.
 
 package Dancer::Plugin::BeforeRoute;
 {
-  $Dancer::Plugin::BeforeRoute::VERSION = '0.2';
+  $Dancer::Plugin::BeforeRoute::VERSION = '0.3';
 }
+use Carp "confess";
 use Dancer ":syntax";
 use Dancer::Plugin;
 
 register before_route => sub {
     my $methods = shift
-        or die "dev: missing method";
-    my $path = shift
-        or die "dev: missing path";
-    my $subref = shift
-        or die "dev: missing a subref";
+        or confess "dev: missing method\n";
 
     my @methods = ref $methods ? @$methods : ($methods);
+
+    my $path = shift
+        or confess "dev: missing path\n";
+    my $subref = shift
+        or confess "dev: missing a subref -> [[ @methods: $path ]]\n";
 
     hook before => sub {
         my $request_method = request->method;

@@ -8,3 +8,4 @@ dist.ini
 lib/Dancer/Plugin/BeforeRoute.pm
 t/01-use.t
 t/02-check-method-and_path.t
+t/TestApp.pm
