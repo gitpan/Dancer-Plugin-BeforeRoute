@@ -15,4 +15,5 @@ name: Dancer-Plugin-BeforeRoute
 requires:
   Dancer: 0
   Test::More: 0
-version: 0.4
+  Try::Tiny: 0
+version: 0.5

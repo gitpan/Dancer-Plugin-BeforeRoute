@@ -84,7 +84,7 @@ under the same terms as Perl itself.
 
 package Dancer::Plugin::BeforeRoute;
 {
-  $Dancer::Plugin::BeforeRoute::VERSION = '0.4';
+  $Dancer::Plugin::BeforeRoute::VERSION = '0.5';
 }
 use Carp "confess";
 use Dancer ":syntax";

@@ -21,10 +21,11 @@ my %WriteMakefileArgs = (
   "NAME" => "Dancer::Plugin::BeforeRoute",
   "PREREQ_PM" => {
     "Dancer" => 0,
-    "Test::More" => 0
+    "Test::More" => 0,
+    "Try::Tiny" => 0
   },
   "TEST_REQUIRES" => {},
-  "VERSION" => "0.4",
+  "VERSION" => "0.5",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -33,7 +34,8 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Dancer" => 0,
-  "Test::More" => 0
+  "Test::More" => 0,
+  "Try::Tiny" => 0
 );
 
 
