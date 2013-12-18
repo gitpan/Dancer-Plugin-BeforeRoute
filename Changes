@@ -1,3 +1,6 @@
+0.6 2013-12-18
+    - Using one before sub for doing all the before-route checking
+
 0.5 2013-12-13
     - Add tests to covers more areas
 

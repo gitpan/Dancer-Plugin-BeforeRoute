@@ -84,47 +84,63 @@ under the same terms as Perl itself.
 
 package Dancer::Plugin::BeforeRoute;
 {
-  $Dancer::Plugin::BeforeRoute::VERSION = '0.5';
+  $Dancer::Plugin::BeforeRoute::VERSION = '0.6';
 }
 use Carp "confess";
 use Dancer ":syntax";
 use Dancer::Plugin;
 
+my @ROUTES = ();
+
+hook before => sub {
+  ROUTE:
+    foreach my $route (@ROUTES) {
+        next ROUTE if !request_for( $route->{path}, @{ $route->{methods} } );
+        $route->{subref}->();
+    }
+};
+
 register before_route => sub {
-
     my ( $path, $subref, @methods ) = _args(@_);
-
-    hook before => sub {
-        request_for( $path, @methods ) or return;
-        $subref->();
-    };
+    push @ROUTES,
+      {
+        methods => \@methods,
+        path    => $path,
+        subref  => $subref,
+      };
 };
 
 register request_for => sub {
     my ( $path, @methods ) = @_;
 
     my $request_method = request->method;
+    my $request_path   = request->path_info;
 
-    if ( !_is_the_right_method( request->method, @methods ) ) {
+    grep { info "Trying to match '$request_method $request_path' against '$_ $path'" } @methods;
+
+    if ( !_is_the_right_method( $request_method, @methods ) ) {
         return;
     }
-    if ( !_is_the_right_path( request->path_info, $path ) ) {
+
+    if ( !_is_the_right_path( $request_path, $path ) ) {
         return;
     }
+
+    info "--> got 1";
 
     return 1;
 };
 
 sub _args {
     my $methods = shift
-        or confess "dev: missing method\n";
+      or confess "dev: missing method\n";
 
     my @methods = ref $methods ? @$methods : ($methods);
 
     my $path = shift
-        or confess "dev: missing path\n";
+      or confess "dev: missing path\n";
     my $subref = shift
-        or confess "dev: missing a subref -> [[ @methods: $path ]]\n";
+      or confess "dev: missing a subref -> [[ @methods: $path ]]\n";
 
     return ( $path, $subref, @methods );
 }
@@ -132,7 +148,7 @@ sub _args {
 sub _is_the_right_method {
     my $method  = shift;
     my @methods = shift;
-    return ( grep {/^\Q$method\E$/i} @methods ) ? 1 : 0;
+    return ( grep { /^\Q$method\E$/i } @methods ) ? 1 : 0;
 }
 
 sub _is_the_right_path {

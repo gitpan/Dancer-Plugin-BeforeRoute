@@ -16,4 +16,4 @@ requires:
   Dancer: 0
   Test::More: 0
   Try::Tiny: 0
-version: 0.5
+version: 0.6
