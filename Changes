@@ -1,3 +1,12 @@
+0.7 2013-12-24
+    - Using cpanfile with dist::zilla
+    - Added before_for any before hooks
+      - e.g. before_template_render
+      - before_serializer
+      - before_file_render
+      - before_error_init
+      - etc...
+
 0.6 2013-12-18
     - Using one before sub for doing all the before-route checking
 

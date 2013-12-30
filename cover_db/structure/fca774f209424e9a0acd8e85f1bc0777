@@ -1,0 +1,1 @@
+{"statement":[3,3,3,4,4,4],"file":"t/lib/TestApp.pm","digest":"fca774f209424e9a0acd8e85f1bc0777","start":{"4":{"BEGIN":[{"statement":3,"time":null}]},"3":{"BEGIN":[{"statement":null,"time":null}]},"-1":{"__COVER__":[{"statement":6,"time":null}]}}}

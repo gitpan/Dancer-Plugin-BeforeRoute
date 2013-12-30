@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-use lib "t";
+use lib "t/lib";
 use TestApp;
 use Dancer::Test;
-use Test::More tests => 5;
+use Test::More tests => 7;
 
 response_content_is [ GET => "/" ]    => "homepage";
 response_content_is [ GET => "/foo" ] => "foo",
@@ -14,3 +14,5 @@ response_content_is [ POST => "/bar" ] => "bar",
     "Test regexp";
 response_status_is [ POST => "/baz" ] => 404,
     "Not found";
+response_content_is [GET => "/index.html" ] => "foobar = yes\n";
+response_content_is [GET => "/second.html" ] => "foo = yes\n";

@@ -1,0 +1,1 @@
+{"statement":[3,10,11,12,6,6,6,7,7,7,8,8,8],"file":"/Users/michael/perl5/bin/prove","digest":"a8d0b2b48592feddb3bf3083c0a24950","start":{"8":{"BEGIN":[{"statement":10,"time":null}]},"6":{"BEGIN":[{"statement":4,"time":null}]},"7":{"BEGIN":[{"statement":7,"time":null}]},"-1":{"__COVER__":[{"statement":13,"time":null}]}}}
