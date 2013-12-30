@@ -3,7 +3,7 @@ use warnings;
 
 package Dancer::Plugin::BeforeRoute;
 {
-  $Dancer::Plugin::BeforeRoute::VERSION = '0.7';
+  $Dancer::Plugin::BeforeRoute::VERSION = '0.71';
 }
 use Carp "confess";
 use Dancer ":syntax";
