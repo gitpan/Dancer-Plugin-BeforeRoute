@@ -3,7 +3,7 @@ use warnings;
 
 package Dancer::Plugin::BeforeRoute;
 {
-  $Dancer::Plugin::BeforeRoute::VERSION = '0.71';
+  $Dancer::Plugin::BeforeRoute::VERSION = '0.72';
 }
 use Carp "confess";
 use Dancer ":syntax";
@@ -81,7 +81,7 @@ sub _args {
 
 sub _is_the_right_method {
     my $method  = shift;
-    my @methods = shift;
+    my @methods = @_;
     return ( grep { /^\Q$method\E$/i } @methods ) ? 1 : 0;
 }
 

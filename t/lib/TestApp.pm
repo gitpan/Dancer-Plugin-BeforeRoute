@@ -74,4 +74,15 @@ get "/second.html" => sub {
     return template "test1.tt", { something => "foo", };
 };
 
+before_route(
+    ["get", "post"] => qr{^/admin},
+    sub {
+        var admin => 1;
+    }
+);
+
+any "/admin/login" => sub {
+    return var "admin";
+};
+
 1;

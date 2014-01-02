@@ -1,3 +1,6 @@
+0.72 2014-02-02
+    - Bugfix - @list = @_ not shift
+
 0.71 2013-12-30
     - Using Manifest.skip to exclude files and folders
 

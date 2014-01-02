@@ -1,11 +1,11 @@
 
 
 This archive contains the distribution Dancer-Plugin-BeforeRoute,
-version 0.71:
+version 0.72:
 
   Run something before a route execute
 
-This software is Copyright (c) 2013 by Michael Vu <email@michael.vu>.
+This software is Copyright (c) 2014 by Michael Vu <email@michael.vu>.
 
 This is free software, licensed under:
 
