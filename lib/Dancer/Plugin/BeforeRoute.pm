@@ -1,150 +1,17 @@
-use strict;
-use warnings;
 
-package Dancer::Plugin::BeforeRoute;
-{
-  $Dancer::Plugin::BeforeRoute::VERSION = '0.72';
-}
-use Carp "confess";
-use Dancer ":syntax";
-use Dancer::Plugin;
-
-my %BEFORE_COLLECTIONS = ();
-my $SETUP_ALL_HOOK     = 0;
-
-register before_route => sub {
-    before_of( before => @_ );
-};
-
-register before_of => sub {
-    my $hook_name = _hook_name( before => shift );
-    my ( $path, $subref, @methods ) = _args(@_);
-    my $collection_ref = _collection($hook_name);
-    push @$collection_ref,
-      {
-        methods => \@methods,
-        path    => $path,
-        subref  => $subref,
-      };
-};
-
-register request_for => sub {
-    my $hook = shift
-      or confess "dev: Missing hook name";
-    my $path = shift
-      or confess "dev: Missing route path";
-    my @methods = @_
-      or confess "dev: Missing methods";
-
-    my $request_method = request->method;
-    my $request_path   = request->path_info;
-
-    grep {
-        info(   "$hook is trying to match "
-              . qq{'$request_method $request_path'}
-              . qq{against '$_ $path'} )
-    } @methods;
-
-    return if !_is_the_right_method( $request_method, @methods );
-    return if !_is_the_right_path( $request_path, $path );
-
-    info "--> got 1";
-
-    return 1;
-};
-
-## Only run once setup the hooks
-hook before => \&_setup_before_route_hooks;
-
-sub _hook_name {
-    my $prefix = shift;
-    my $name   = shift
-      or confess "dev: missing hook name\n";
-    return $name =~ m/^$prefix/
-      ? $name
-      : $prefix . "_" . $name;
-}
-
-sub _args {
-    my $methods = shift
-      or confess "dev: missing method\n";
-
-    my @methods = ref $methods ? @$methods : ($methods);
-
-    my $path = shift
-      or confess "dev: missing path\n";
-    my $subref = shift
-      or confess "dev: missing a subref -> [[ @methods: $path ]]\n";
-
-    return ( $path, $subref, @methods );
-}
-
-sub _is_the_right_method {
-    my $method  = shift;
-    my @methods = @_;
-    return ( grep { /^\Q$method\E$/i } @methods ) ? 1 : 0;
-}
-
-sub _is_the_right_path {
-    my $got_path      = shift;
-    my $expected_path = shift;
-    if ( ref $expected_path ) {
-        return $got_path =~ /$expected_path/ ? 1 : 0;
-    }
-    if ( $expected_path =~ /\:/ ) {
-        $expected_path =~ s/\:[^\/]+/[^\/]+/g;
-        return $got_path =~ /$expected_path/ ? 1 : 0;
-    }
-    return $got_path eq $expected_path ? 1 : 0;
-}
-
-sub _collection {
-    my $hook_name = shift
-      or confess "dev: missing hook name";
-    $BEFORE_COLLECTIONS{$hook_name} ||= [];
-}
-
-sub _setup_before_route_hooks {
-    ## Just return at second time
-    return if $SETUP_ALL_HOOK;
-
-    ## Run at first time
-    foreach my $hook_name ( keys %BEFORE_COLLECTIONS ) {
-        my $collection_ref = _collection($hook_name);
-        hook $hook_name => sub {
-            _scan_routes_and_execute( $hook_name, \@_, @$collection_ref );
-        }
-    }
-
-    $SETUP_ALL_HOOK = 1;
-}
-
-sub _scan_routes_and_execute {
-    my $hook_name = shift
-      or confess "dev: Missing hook name";
-    my $args   = shift;
-    my @routes = @_;
-
-  ROUTE:
-    foreach my $route (@routes) {
-        next ROUTE
-          if !request_for( $hook_name, $route->{path}, @{ $route->{methods} } );
-        $route->{subref}->(@$args);
-    }
-}
-
-register_plugin;
-
-__END__
 =head1 NAME
  
 Dancer::Plugin::BeforeRoute - A before hook for a specify route or routes
   
-=head1 SYNOPSIS
+=head1 USAGE
 
  use Dancer::Plugin::BeforeRoute;
 
  before_route get => "/", sub {
+     var before_run => "homepage";
+ };
+
+ before_route ["get", "post"] => "/", sub {
      var before_run => "homepage";
  };
 
@@ -153,21 +20,16 @@ Dancer::Plugin::BeforeRoute - A before hook for a specify route or routes
      return var "before_run";
  };
 
- ## Only for GET /foo
  before_route get => "/foo", sub {
      var before_run => "foo"
- };
-
- ## Only for GET /foo
- before_for template_render => get => "/foo" => sub {
-     my $stash = shift;
-     $stash->{foo} = "bar"; 
  };
 
  get "/foo" => sub {
      ## Return "foo"
      return var "before_run";
  };
+
+ before_template_route 
 
 =head1 DESCRIPTION
 
@@ -224,3 +86,84 @@ under the same terms as Perl itself.
 
 =cut
 
+package Dancer::Plugin::BeforeRoute;
+$Dancer::Plugin::BeforeRoute::VERSION = '0.61';
+use Carp "confess";
+use Dancer ":syntax";
+use Dancer::Plugin;
+
+my @ROUTES = ();
+
+hook before => sub {
+  ROUTE:
+    foreach my $route (@ROUTES) {
+        next ROUTE if !request_for( $route->{path}, @{ $route->{methods} } );
+        $route->{subref}->();
+    }
+};
+
+register before_route => sub {
+    my ( $path, $subref, @methods ) = _args(@_);
+    push @ROUTES,
+      {
+        methods => \@methods,
+        path    => $path,
+        subref  => $subref,
+      };
+};
+
+register request_for => sub {
+    my ( $path, @methods ) = @_;
+
+    my $request_method = request->method;
+    my $request_path   = request->path_info;
+
+    grep { info "Trying to match '$request_method $request_path' against '$_ $path'" } @methods;
+
+    if ( !_is_the_right_method( $request_method, @methods ) ) {
+        return;
+    }
+
+    if ( !_is_the_right_path( $request_path, $path ) ) {
+        return;
+    }
+
+    info "--> got 1";
+
+    return 1;
+};
+
+sub _args {
+    my $methods = shift
+      or confess "dev: missing method\n";
+
+    my @methods = ref $methods ? @$methods : ($methods);
+
+    my $path = shift
+      or confess "dev: missing path\n";
+    my $subref = shift
+      or confess "dev: missing a subref -> [[ @methods: $path ]]\n";
+
+    return ( $path, $subref, @methods );
+}
+
+sub _is_the_right_method {
+    my $method  = shift;
+    my @methods = @_;
+    return ( grep { /^\Q$method\E$/i } @methods ) ? 1 : 0;
+}
+
+sub _is_the_right_path {
+    my $got_path      = shift;
+    my $expected_path = shift;
+    if ( ref $expected_path ) {
+        return $got_path =~ /$expected_path/ ? 1 : 0;
+    }
+    if ( $expected_path =~ /\:/ ) {
+        $expected_path =~ s/\:[^\/]+/[^\/]+/g;
+        return $got_path =~ /$expected_path/ ? 1 : 0;
+    }
+    return $got_path eq $expected_path ? 1 : 0;
+}
+
+register_plugin;

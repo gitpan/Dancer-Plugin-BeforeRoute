@@ -1,17 +1,5 @@
-0.72 2014-02-02
-    - Bugfix - @list = @_ not shift
-
-0.71 2013-12-30
-    - Using Manifest.skip to exclude files and folders
-
-0.7 2013-12-24
-    - Using cpanfile with dist::zilla
-    - Added before_for any before hooks
-      - e.g. before_template_render
-      - before_serializer
-      - before_file_render
-      - before_error_init
-      - etc...
+0.61 2014-02-18
+   - Bugfix - @list = @_ not shift
 
 0.6 2013-12-18
     - Using one before sub for doing all the before-route checking
