@@ -87,7 +87,7 @@ under the same terms as Perl itself.
 =cut
 
 package Dancer::Plugin::BeforeRoute;
-$Dancer::Plugin::BeforeRoute::VERSION = '0.61';
+$Dancer::Plugin::BeforeRoute::VERSION = '0.8';
 use Carp "confess";
 use Dancer ":syntax";
 use Dancer::Plugin;
