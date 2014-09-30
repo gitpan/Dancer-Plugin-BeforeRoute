@@ -87,7 +87,7 @@ under the same terms as Perl itself.
 =cut
 
 package Dancer::Plugin::BeforeRoute;
-$Dancer::Plugin::BeforeRoute::VERSION = '0.9';
+$Dancer::Plugin::BeforeRoute::VERSION = '1.0';
 use Carp "confess";
 use Dancer ":syntax";
 use Dancer::Plugin;
@@ -118,9 +118,14 @@ register request_for => sub {
     my $request_method = request->method;
     my $request_path   = request->path_info;
 
+    # Shared portion of the log message,
+    # for both when the request matches and when it does not.
+    my $match_message = q{};
+
     grep {
-        info
-          "Trying to match '$request_method $request_path' against '$_ $path'"
+        $match_message = "'$request_method $request_path' against '$_ $path'";
+        # Mismatches only logged at debug to remove excessive log volume.
+        debug "Trying to match $match_message"
     } @methods;
 
     if ( !_is_the_right_method( $request_method, @methods ) ) {
@@ -131,7 +136,7 @@ register request_for => sub {
         return;
     }
 
-    info "--> got 1";
+    info "Matched $match_message --> got 1";
 
     return 1;
 };
